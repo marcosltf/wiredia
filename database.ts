@@ -1,6 +1,9 @@
 import Database from "better-sqlite3";
+import path from "path";
 
-const db = new Database("app.db");
+// Usar path absoluto para o database (na raiz do projeto)
+const dbPath = path.resolve(process.cwd(), "app.db");
+const db = new Database(dbPath);
 
 // Tabela de usuários
 db.prepare(`
