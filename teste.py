@@ -2,7 +2,7 @@ import requests
 
 BASE_URL = "http://localhost:3000"
 # BASE_URL = "http://localhost:3000"  # descomente para testar local
-API_KEY = "a6dfd636847b87863710226b857c03edc95a4a090132f438"
+API_KEY = ""
 
 HEADERS = {
     "x-api-key": API_KEY
