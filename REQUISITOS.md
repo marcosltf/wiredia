@@ -299,6 +299,36 @@ wiredia/
 
 **Banco de Dados**
 
+**Diagrama Entidade Relacionamento**
+
+```mermaid
+erDiagram
+    USERS {
+        INTEGER id PK
+        TEXT email UK
+        TEXT password
+        TEXT ip_registro
+    }
+    
+    API_KEYS {
+        INTEGER id PK
+        INTEGER user_id FK
+        TEXT key UK
+        INTEGER created_at
+    }
+    
+    USAGE {
+        INTEGER id PK
+        INTEGER user_id FK
+        INTEGER count
+    }
+    
+    USERS ||--o{ API_KEYS : "possui"
+    USERS ||--o| USAGE : "tem"
+```
+
+**Estrutura das Tabelas**
+
 Tabela `users`:
 - id (INTEGER PRIMARY KEY)
 - email (TEXT UNIQUE)
@@ -307,13 +337,13 @@ Tabela `users`:
 
 Tabela `api_keys`:
 - id (INTEGER PRIMARY KEY)
-- user_id (INTEGER)
+- user_id (INTEGER, FOREIGN KEY -> users.id)
 - key (TEXT UNIQUE)
 - created_at (INTEGER)
 
 Tabela `usage`:
 - id (INTEGER PRIMARY KEY)
-- user_id (INTEGER)
+- user_id (INTEGER, FOREIGN KEY -> users.id)
 - count (INTEGER DEFAULT 0)
 
 ---
