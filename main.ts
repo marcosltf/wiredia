@@ -42,17 +42,36 @@ const logRequest = (data: Record<string, unknown>): void => {
   });
 };
 
-app.use((req, res, next) => {
+// Função helper para extrair IP real
+function getClientIp(req: express.Request): string {
+  // Priorizar x-forwarded-for (quando atrás de proxy)
   const forwardedFor = req.headers["x-forwarded-for"];
-  const forwardedIp = Array.isArray(forwardedFor)
-    ? forwardedFor[0]
-    : forwardedFor?.split(",")[0]?.trim();
+  if (forwardedFor) {
+    const ips = Array.isArray(forwardedFor) 
+      ? forwardedFor 
+      : forwardedFor.split(",").map(ip => ip.trim());
+    // Pegar o primeiro IP (cliente original)
+    const clientIp = ips[0];
+    // Remover prefixo IPv6 ::ffff: se presente
+    return clientIp.replace(/^::ffff:/, "");
+  }
 
-  const ip =
-    forwardedIp ||
-    req.socket.remoteAddress ||
-    (typeof req.ip === "string" ? req.ip : undefined) ||
-    "unknown";
+  // Tentar req.ip (se express trust proxy estiver configurado)
+  if (req.ip && req.ip !== "::ffff:127.0.0.1" && req.ip !== "127.0.0.1") {
+    return req.ip.replace(/^::ffff:/, "");
+  }
+
+  // Fallback para remoteAddress
+  const remoteAddr = req.socket.remoteAddress;
+  if (remoteAddr && remoteAddr !== "::ffff:127.0.0.1" && remoteAddr !== "127.0.0.1") {
+    return remoteAddr.replace(/^::ffff:/, "");
+  }
+
+  return "unknown";
+}
+
+app.use((req, res, next) => {
+  const ip = getClientIp(req);
 
   const startedAt = Date.now();
 
@@ -93,7 +112,7 @@ const RATE_LIMIT_MAX = 100;
 const ipRequests = new Map<string, number[]>();
 
 app.use((req, res, next) => {
-  const ip = (req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown") as string;
+  const ip = getClientIp(req);
   const now = Date.now();
   const windowStart = now - RATE_LIMIT_WINDOW_MS;
 
