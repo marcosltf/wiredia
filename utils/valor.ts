@@ -1,4 +1,4 @@
-// Using native fetch (Node.js 18+)
+import fetch from "node-fetch";
 
 const DEFAULT_VS = "BRL";
 const SUPPORTED_FIAT = new Set(["USD", "BRL", "EUR"]);
