@@ -1,7 +1,11 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 import express from "express";
 import fs from "fs";
 import path from "path";
+
+// Carregar .env da raiz do projeto (não de dist/)
+const envPath = path.resolve(__dirname, "..", ".env");
+dotenv.config({ path: envPath });
 
 import { hashText } from "./utils/hash";
 import { compareHash } from "./utils/compare";

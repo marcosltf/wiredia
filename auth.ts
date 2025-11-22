@@ -1,4 +1,8 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+
+// Carregar .env da raiz do projeto
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 import { Router } from "express";
 import db from "./database";
 import jwt from "jsonwebtoken";
