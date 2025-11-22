@@ -1,5 +1,4 @@
 import "dotenv/config";
-import fetch from "node-fetch";
 
 const API_KEY = process.env.LASTFM_API_KEY || "babc1e1de565c80d95983aa7c4e28f76";
 const BASE_URL = "http://ws.audioscrobbler.com/2.0/";
