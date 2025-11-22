@@ -1,8 +1,8 @@
 import requests
 
-BASE_URL = "https://https://api.wiredia.dev/"
+BASE_URL = "https://api.wiredia.dev"
 # BASE_URL = "http://localhost:3000"  # descomente para testar local
-API_KEY = "c21d2779b5c31ba862d76ee11143b4d4c18808cac065e803"
+API_KEY = "b9887ec2961ae2c1a0030bfe1fa17022265dca5cfae27880"
 
 HEADERS = {
     "x-api-key": API_KEY
