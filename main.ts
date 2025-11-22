@@ -4,7 +4,9 @@ import fs from "fs";
 import path from "path";
 
 // Carregar .env da raiz do projeto (não de dist/)
-const envPath = path.resolve(__dirname, "..", ".env");
+// Se estiver rodando de dist/, __dirname será dist/, então sobe um nível
+// Se estiver rodando direto, process.cwd() já é a raiz
+const envPath = path.resolve(process.cwd(), ".env");
 dotenv.config({ path: envPath });
 
 import { hashText } from "./utils/hash";
