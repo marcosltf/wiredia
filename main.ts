@@ -52,21 +52,24 @@ function getClientIp(req: express.Request): string {
   if (forwardedFor) {
     const ips = Array.isArray(forwardedFor) 
       ? forwardedFor 
-      : forwardedFor.split(",").map(ip => ip.trim());
+      : String(forwardedFor).split(",").map(ip => ip.trim());
     // Pegar o primeiro IP (cliente original)
     const clientIp = ips[0];
-    // Remover prefixo IPv6 ::ffff: se presente
-    return clientIp.replace(/^::ffff:/, "");
+    if (clientIp) {
+      // Remover prefixo IPv6 ::ffff: se presente
+      return clientIp.replace(/^::ffff:/, "");
+    }
   }
 
   // Tentar req.ip (se express trust proxy estiver configurado)
-  if (req.ip && req.ip !== "::ffff:127.0.0.1" && req.ip !== "127.0.0.1") {
-    return req.ip.replace(/^::ffff:/, "");
+  const reqIp = req.ip;
+  if (reqIp && typeof reqIp === "string" && reqIp !== "::ffff:127.0.0.1" && reqIp !== "127.0.0.1") {
+    return reqIp.replace(/^::ffff:/, "");
   }
 
   // Fallback para remoteAddress
   const remoteAddr = req.socket.remoteAddress;
-  if (remoteAddr && remoteAddr !== "::ffff:127.0.0.1" && remoteAddr !== "127.0.0.1") {
+  if (remoteAddr && typeof remoteAddr === "string" && remoteAddr !== "::ffff:127.0.0.1" && remoteAddr !== "127.0.0.1") {
     return remoteAddr.replace(/^::ffff:/, "");
   }
 
