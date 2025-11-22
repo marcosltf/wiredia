@@ -311,27 +311,27 @@ wiredia/
 ```mermaid
 erDiagram
     USERS {
-        INTEGER id PK
-        TEXT email UK
-        TEXT password
-        TEXT ip_registro
+        INTEGER id PK "Chave Primária - Identificador único"
+        TEXT email UK "Email único - Usado para login"
+        TEXT password "Senha criptografada com bcrypt"
+        TEXT ip_registro "IP de origem do registro"
     }
     
     API_KEYS {
-        INTEGER id PK
-        INTEGER user_id FK
-        TEXT key UK
-        INTEGER created_at
+        INTEGER id PK "Chave Primária - Identificador único"
+        INTEGER user_id FK "Chave Estrangeira -> users.id"
+        TEXT key UK "Chave de API única (48 caracteres hex)"
+        INTEGER created_at "Timestamp Unix da criação"
     }
     
     USAGE {
-        INTEGER id PK
-        INTEGER user_id FK
-        INTEGER count
+        INTEGER id PK "Chave Primária - Identificador único"
+        INTEGER user_id FK "Chave Estrangeira -> users.id"
+        INTEGER count "Contador de requisições (padrão: 0)"
     }
     
-    USERS ||--o{ API_KEYS : "possui"
-    USERS ||--o| USAGE : "tem"
+    USERS ||--o{ API_KEYS : "Um usuário pode ter várias API keys"
+    USERS ||--o| USAGE : "Um usuário tem um contador de uso"
 ```
 
 **Estrutura das Tabelas**
