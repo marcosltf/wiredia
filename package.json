@@ -4,7 +4,9 @@
   "description": "",
   "main": "main.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn main.ts"
+    "dev": "ts-node-dev --respawn main.ts",
+    "build": "tsc && cp -r public dist/",
+    "start": "node dist/main.js"
   },
   "keywords": [],
   "author": "",
