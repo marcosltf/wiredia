@@ -7,7 +7,7 @@
 
 - **Autenticação**: Sistema de login/registro com JWT e senhas criptografadas (bcrypt)
 - **API Keys**: Geração e gerenciamento de chaves de API por usuário
-- **Database**: SQLite com melhor-sqlite3 para armazenamento de dados
+- **Database**: SQLite com better-sqlite3 para armazenamento de dados
 - **Rate Limiting**: 100 requisições por minuto por IP
 - **Logging**: Logs diários com IP, método, path, status, email e API key utilizada
 - **Painel Admin**: Interface administrativa para monitoramento de usuários e requisições
