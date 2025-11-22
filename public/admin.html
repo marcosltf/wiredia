@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Wiredia API</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 { margin-bottom: 32px; font-size: 28px; }
+        .logout {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #7f1d1d;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .logout:hover { background: #991b1b; }
+        .section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background: #0a0a0a;
+            font-weight: 600;
+            color: #aaa;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        td {
+            font-size: 14px;
+        }
+        tr:hover {
+            background: #0a0a0a;
+        }
+        .error {
+            background: #7f1d1d;
+            border: 1px solid #991b1b;
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+        .refresh-btn {
+            background: #2563eb;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        .refresh-btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <button class="logout" onclick="logout()">Sair</button>
+    <div class="container">
+        <h1>Painel Administrativo</h1>
+        
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div class="section">
+            <h2>Últimas Requisições</h2>
+            <button class="refresh-btn" onclick="loadLogs()">Atualizar</button>
+            <div id="logsContainer">
+                <div class="loading">Carregando...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Usuários</h2>
+            <button class="refresh-btn" onclick="loadUsers()">Atualizar</button>
+            <div id="usersContainer">
+                <div class="loading">Carregando...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "/login";
+        }
+
+        // Verificar se é admin antes de carregar dados
+        async function verifyAdminAccess() {
+            try {
+                const res = await fetch("/admin/users", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.status === 401) {
+                    // Token inválido ou expirado - deslogar
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                    return false;
+                }
+                if (res.status === 403) {
+                    // Usuário não é admin - redirecionar para panel sem deslogar
+                    window.location.href = "/panel";
+                    return false;
+                }
+                return true;
+            } catch {
+                // Em caso de erro de rede, verificar se o token ainda é válido
+                // Tentando acessar uma rota que não precisa ser admin
+                try {
+                    const checkRes = await fetch("/keys/stats", {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                    if (checkRes.status === 401) {
+                        localStorage.removeItem("token");
+                        window.location.href = "/login";
+                    } else {
+                        // Token válido mas não é admin
+                        window.location.href = "/panel";
+                    }
+                } catch {
+                    window.location.href = "/login";
+                }
+                return false;
+            }
+        }
+
+        // Sanitização XSS
+        function escapeHtml(text) {
+            if (text == null) return '-';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        async function loadLogs() {
+            const container = document.getElementById("logsContainer");
+            try {
+                const res = await fetch("/admin/logs?limit=50", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                    return;
+                }
+                if (res.status === 403) {
+                    window.location.href = "/panel";
+                    return;
+                }
+
+                const logs = await res.json();
+                
+                if (logs.length === 0) {
+                    container.innerHTML = "<p style='color: #aaa;'>Nenhum log encontrado.</p>";
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>IP</th>
+                                <th>Método</th>
+                                <th>Path</th>
+                                <th>Status</th>
+                                <th>Email</th>
+                                <th>API Key</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${logs.map(log => `
+                                <tr>
+                                    <td>${escapeHtml(log.data)}</td>
+                                    <td>${escapeHtml(log.hora)}</td>
+                                    <td>${escapeHtml(log.ip)}</td>
+                                    <td>${escapeHtml(log.method)}</td>
+                                    <td>${escapeHtml(log.path)}</td>
+                                    <td>${escapeHtml(log.status)}</td>
+                                    <td>${escapeHtml(log.user_email)}</td>
+                                    <td style="font-family: monospace; font-size: 11px; color: #86efac;">
+                                        ${log.api_key ? escapeHtml(log.api_key.substring(0, 20) + '...') : '-'}
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                container.innerHTML = "<p style='color: #fca5a5;'>Erro ao carregar logs.</p>";
+            }
+        }
+
+        async function loadUsers() {
+            const container = document.getElementById("usersContainer");
+            try {
+                const res = await fetch("/admin/users", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (res.status === 401) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/login";
+                    return;
+                }
+                if (res.status === 403) {
+                    window.location.href = "/panel";
+                    return;
+                }
+
+                const users = await res.json();
+                
+                if (users.length === 0) {
+                    container.innerHTML = "<p style='color: #aaa;'>Nenhum usuário encontrado.</p>";
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>IP de Registro</th>
+                                <th>Requisições</th>
+                                <th>API Keys</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${escapeHtml(user.id)}</td>
+                                    <td>${escapeHtml(user.email)}</td>
+                                    <td>${escapeHtml(user.ip_registro)}</td>
+                                    <td>${escapeHtml(user.request_count || 0)}</td>
+                                    <td>
+                                        ${user.api_keys && user.api_keys.length > 0 
+                                            ? user.api_keys.map(key => {
+                                                const date = new Date(key.created_at);
+                                                return `<div style="margin-bottom: 8px;">
+                                                    <div style="font-family: monospace; font-size: 11px; color: #86efac; word-break: break-all;">
+                                                        ${escapeHtml(key.key)}
+                                                    </div>
+                                                    <div style="font-size: 10px; color: #666; margin-top: 2px;">
+                                                        ${date.toLocaleString("pt-BR")}
+                                                    </div>
+                                                </div>`;
+                                            }).join("")
+                                            : '<span style="color: #666;">Nenhuma</span>'
+                                        }
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                `;
+            } catch (err) {
+                container.innerHTML = "<p style='color: #fca5a5;'>Erro ao carregar usuários.</p>";
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+        }
+
+        function showError(msg) {
+            const errorEl = document.getElementById("error");
+            errorEl.textContent = msg;
+            errorEl.style.display = "block";
+            setTimeout(() => {
+                errorEl.style.display = "none";
+            }, 5000);
+        }
+
+        // Verificar acesso de admin antes de carregar dados
+        verifyAdminAccess().then(hasAccess => {
+            if (hasAccess) {
+                loadLogs();
+                loadUsers();
+            }
+        });
+    </script>
+</body>
+</html>
+
