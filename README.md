@@ -1,6 +1,50 @@
-# api.wiredia.dev
+# <img src="https://img.shields.io/badge/API-Wiredia-2563eb?style=flat" alt="Wiredia API" /> api.wiredia.dev
 
-Documentação rápida dos endpoints expostos pelo servidor Express (`main.ts`). Todos retornam respostas em JSON e seguem o rate limit global de 100 requisições por minuto por IP.
+> Documentação rápida dos endpoints expostos pelo servidor Express (`main.ts`).  
+> Todos retornam respostas em JSON e seguem o rate limit global de **100 requisições por minuto por IP**.
+
+---
+
+## Autenticação
+
+Para usar a API, você precisa de uma API Key. Primeiro, registre-se e gere sua chave:
+
+### Registro e Login
+
+1. **Registrar**: Acesse [`https://api.wiredia.dev/registrar`](https://api.wiredia.dev/registrar)
+   - Informe seu email e senha (mínimo 8 caracteres)
+   - Após o registro, você será redirecionado para a página de login
+
+2. **Login**: Acesse [`https://api.wiredia.dev/login`](https://api.wiredia.dev/login)
+   - Use seu email e senha
+   - Marque "Lembrar de mim" para manter a sessão ativa
+   - Após o login, você será redirecionado para o painel
+
+### Painel de Controle
+
+No painel ([`https://api.wiredia.dev/panel`](https://api.wiredia.dev/panel)), você pode:
+
+- **Ver estatísticas**: Suas requisições pessoais e o total de requisições da API
+- **Gerar API Keys**: Clique em "Gerar API Key" para criar uma nova chave
+- **Gerenciar chaves**: Visualize todas as suas API keys e quando foram criadas
+
+### Usando a API Key
+
+Todas as requisições aos endpoints da API precisam incluir sua API Key no header:
+
+```python
+import requests
+
+headers = {
+    "x-api-key": "sua_api_key_aqui"
+}
+
+resp = requests.get("https://api.wiredia.dev/hash", 
+                    params={"text": "hello"}, 
+                    headers=headers)
+```
+
+---
 
 ## Rotas disponíveis
 
@@ -12,7 +56,10 @@ Documentação rápida dos endpoints expostos pelo servidor Express (`main.ts`).
 ```python
 import requests
 
-resp = requests.get("https://api.wiredia.dev/hash", params={"text": "hello", "algorithm": "sha256"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.get("https://api.wiredia.dev/hash", 
+                    params={"text": "hello", "algorithm": "sha256"},
+                    headers=headers)
 print(resp.json())  # {"algorithm": "sha256", "hash": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"}
 ```
 
@@ -24,11 +71,14 @@ print(resp.json())  # {"algorithm": "sha256", "hash": "2cf24dba5fb0a30e26e83b2ac
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/compare", json={
-    "text": "hello",
-    "hash": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
-    "algorithm": "sha256"
-})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/compare", 
+                     json={
+                         "text": "hello",
+                         "hash": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+                         "algorithm": "sha256"
+                     },
+                     headers=headers)
 print(resp.json())  # {"algorithm": "sha256", "match": true}
 ```
 
@@ -40,7 +90,10 @@ print(resp.json())  # {"algorithm": "sha256", "match": true}
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/base64/encode", json={"text": "Hello, World!"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/base64/encode", 
+                     json={"text": "Hello, World!"},
+                     headers=headers)
 print(resp.json())  # {"encoded": "SGVsbG8sIFdvcmxkIQ=="}
 ```
 
@@ -52,7 +105,10 @@ print(resp.json())  # {"encoded": "SGVsbG8sIFdvcmxkIQ=="}
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/base64/decode", json={"base64": "SGVsbG8sIFdvcmxkIQ=="})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/base64/decode", 
+                     json={"base64": "SGVsbG8sIFdvcmxkIQ=="},
+                     headers=headers)
 print(resp.json())  # {"decoded": "Hello, World!"}
 ```
 
@@ -64,7 +120,10 @@ print(resp.json())  # {"decoded": "Hello, World!"}
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/cpf", json={"cpf": "12345678909"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/cpf", 
+                     json={"cpf": "12345678909"},
+                     headers=headers)
 print(resp.json())  # {"valid": true, "formatted": "123.456.789-09"}
 ```
 
@@ -76,7 +135,10 @@ print(resp.json())  # {"valid": true, "formatted": "123.456.789-09"}
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/cep", json={"cep": "01311000"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/cep", 
+                     json={"cep": "01311000"},
+                     headers=headers)
 print(resp.json())  # {"valido": true, "cep_limpo": "01311000", "cep_formatado": "01311-000", "regiao": "Grande São Paulo", "erros": []}
 ```
 
@@ -88,7 +150,10 @@ print(resp.json())  # {"valido": true, "cep_limpo": "01311000", "cep_formatado":
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/hex/encode", json={"text": "hello"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/hex/encode", 
+                     json={"text": "hello"},
+                     headers=headers)
 print(resp.json())  # {"encoded": "68656c6c6f"}
 ```
 
@@ -100,7 +165,10 @@ print(resp.json())  # {"encoded": "68656c6c6f"}
 ```python
 import requests
 
-resp = requests.post("https://api.wiredia.dev/hex/decode", json={"hex": "68656c6c6f"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.post("https://api.wiredia.dev/hex/decode", 
+                     json={"hex": "68656c6c6f"},
+                     headers=headers)
 print(resp.json())  # {"decoded": "hello"}
 ```
 
@@ -112,7 +180,10 @@ print(resp.json())  # {"decoded": "hello"}
 ```python
 import requests
 
-resp = requests.get("https://api.wiredia.dev/timestamp", params={"ts": "1732102110"})
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.get("https://api.wiredia.dev/timestamp", 
+                    params={"ts": "1732102110"},
+                    headers=headers)
 print(resp.json())  # {"input": "1732102110", "iso": "2024-11-20T12:01:50.000Z", "locale": "20/11/2024 09:01:50", "utc": "Wed, 20 Nov 2024 12:01:50 GMT"}
 ```
 
@@ -122,7 +193,9 @@ print(resp.json())  # {"input": "1732102110", "iso": "2024-11-20T12:01:50.000Z",
 ```python
 import requests
 
-resp = requests.get("https://api.wiredia.dev/lastfm/seu_username")
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.get("https://api.wiredia.dev/lastfm/seu_username",
+                    headers=headers)
 print(resp.json())  # {"artist": "...", "track": "...", "album": "...", etc.}
 ```
 
@@ -134,15 +207,21 @@ print(resp.json())  # {"artist": "...", "track": "...", "album": "...", etc.}
 ```python
 import requests
 
-resp = requests.get("https://api.wiredia.dev/valor/USD")
+headers = {"x-api-key": "sua_api_key_aqui"}
+resp = requests.get("https://api.wiredia.dev/valor/USD", headers=headers)
 print(resp.json())  # {"moeda": "USD", "valor": 5.25}
 
-resp = requests.get("https://api.wiredia.dev/valor/BTC")
+resp = requests.get("https://api.wiredia.dev/valor/BTC", headers=headers)
 print(resp.json())  # {"moeda": "BTC", "valor": 350000.50}
 ```
 
+---
+
 ## Logging
-- Cada requisição gera uma linha JSON em `logs/YYYY-MM-DD.log`, com campos como `ip`, `method`, `path`, `status`, `body`, etc.
+
+Cada requisição gera uma linha JSON em `logs/YYYY-MM-DD.log`, com campos como `ip`, `method`, `path`, `status`, `body`, etc.
+
+---
 
 ## Execução
 ```bash
