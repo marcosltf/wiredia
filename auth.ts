@@ -16,7 +16,15 @@ const JWT_SECRET = process.env.JWT_SECRET || "super_secreto";
 // Helper para verificar se é admin
 function isAdmin(email: string): boolean {
     const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim().toLowerCase());
-    return adminEmails.includes(email.toLowerCase());
+    const emailLower = email.toLowerCase().trim();
+    const isAdminUser = adminEmails.includes(emailLower);
+    
+    // Debug log
+    if (process.env.NODE_ENV !== "production") {
+        console.log("Admin check:", { email, emailLower, adminEmails, isAdminUser });
+    }
+    
+    return isAdminUser;
 }
 
 // Função helper para pegar IP

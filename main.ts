@@ -134,7 +134,15 @@ app.get("/panel", (req, res) => {
 // Helper para verificar se é admin
 function isAdmin(email: string): boolean {
   const adminEmails = (process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim().toLowerCase());
-  return adminEmails.includes(email.toLowerCase());
+  const emailLower = email.toLowerCase().trim();
+  const isAdminUser = adminEmails.includes(emailLower);
+  
+  // Debug log (remover em produção se necessário)
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Admin check:", { email, emailLower, adminEmails, isAdminUser });
+  }
+  
+  return isAdminUser;
 }
 
 // Rota /admin - serve HTML (proteção feita no frontend e nas rotas de dados)
