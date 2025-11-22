@@ -359,7 +359,6 @@ Armazena o contador de requisições por usuário.
 **Relacionamentos**
 - Um usuário (`users`) pode possuir múltiplas API keys (`api_keys`) - Relação 1:N
 - Um usuário (`users`) possui um único contador de uso (`usage`) - Relação 1:1
-- As chaves estrangeiras garantem integridade referencial (CASCADE DELETE não configurado)
 
 ---
 
@@ -451,10 +450,6 @@ pm2 start dist/main.js --name wiredia-api ## em realidade de producao eu to roda
 pm2 logs wiredia-api
 pm2 restart wiredia-api
 ```
-
-**Configuração do Servidor**
-- Trust Proxy configurado para capturar IP real atrás de proxy/nginx
-- Porta 3000
 - HTTPS configurado no nível de proxy reverso (Nginx)
 
 
