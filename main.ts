@@ -24,6 +24,9 @@ import db from "./database";
 const app = express();
 const PORT = 3000;
 
+// Configurar trust proxy para pegar IP real quando atrás de proxy/nginx
+app.set("trust proxy", true);
+
 app.use(express.json());
 app.use(express.static("public"));
 
