@@ -2,7 +2,7 @@ import requests
 
 BASE_URL = "https://api.wiredia.dev"
 # BASE_URL = "http://localhost:3000"  # descomente para testar local
-API_KEY = "b9887ec2961ae2c1a0030bfe1fa17022265dca5cfae27880"
+API_KEY = "sua_chave_para_testes" # nao deixei no .env essa variavel pq o teste.py eh standalone
 
 HEADERS = {
     "x-api-key": API_KEY
