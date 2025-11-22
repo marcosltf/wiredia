@@ -13,6 +13,36 @@
 - **Painel Admin**: Interface administrativa para monitoramento de usuários e requisições
 - **Segurança**: Validação de entrada, sanitização XSS, proteção contra path traversal
 
+## Estrutura do Projeto
+
+```
+wiredia/
+├── main.ts              # Servidor Express principal
+├── auth.ts              # Rotas de autenticação (login/registro)
+├── apikey.ts            # Gerenciamento de API keys
+├── database.ts          # Configuração do SQLite
+├── package.json         # Dependências do projeto
+├── tsconfig.json        # Configuração TypeScript
+├── .env.example         # Exemplo de variáveis de ambiente
+├── utils/               # Utilitários
+│   ├── hash.ts         # Funções de hash
+│   ├── compare.ts      # Comparação de hashes
+│   ├── base64.ts        # Codificação/decodificação Base64
+│   ├── hex.ts          # Codificação/decodificação hexadecimal
+│   ├── cpf.ts          # Validação e formatação de CPF
+│   ├── cep.ts          # Validação de CEP brasileiro
+│   ├── time.ts         # Conversão de timestamps
+│   ├── valor.ts        # Conversão de moedas (fiat e crypto)
+│   └── lastfm.ts       # Integração com Last.fm API
+├── public/              # Arquivos estáticos (HTML)
+│   ├── login.html      # Página de login
+│   ├── register.html   # Página de registro
+│   ├── panel.html      # Painel do usuário
+│   └── admin.html      # Painel administrativo
+├── logs/                # Logs diários (YYYY-MM-DD.log)
+└── dist/                # Código compilado (gerado)
+```
+
 ---
 
 ## Autenticação
