@@ -3,6 +3,16 @@
 > Documentação rápida dos endpoints expostos pelo servidor Express (`main.ts`).  
 > Todos retornam respostas em JSON e seguem o rate limit global de **100 requisições por minuto por IP**.
 
+## Features
+
+- **Autenticação**: Sistema de login/registro com JWT e senhas criptografadas (bcrypt)
+- **API Keys**: Geração e gerenciamento de chaves de API por usuário
+- **Database**: SQLite com melhor-sqlite3 para armazenamento de dados
+- **Rate Limiting**: 100 requisições por minuto por IP
+- **Logging**: Logs diários com IP, método, path, status, email e API key utilizada
+- **Painel Admin**: Interface administrativa para monitoramento de usuários e requisições
+- **Segurança**: Validação de entrada, sanitização XSS, proteção contra path traversal
+
 ---
 
 ## Autenticação
