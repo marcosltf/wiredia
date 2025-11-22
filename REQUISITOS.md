@@ -20,6 +20,7 @@ A Wiredia API é uma API RESTful desenvolvida em Node.js/Express que fornece ser
 - [2. Requisitos Funcionais](#2-requisitos-funcionais)
 - [3. Requisitos Não Funcionais](#3-requisitos-não-funcionais)
 - [4. Arquitetura e Tecnologias](#4-arquitetura-e-tecnologias)
+  - [4.5 Banco de Dados](#45-banco-de-dados)
 - [5. Variáveis de Ambiente](#5-variáveis-de-ambiente)
 - [6. Endpoints da API](#6-endpoints-da-api)
 - [7. Segurança Implementada](#7-segurança-implementada)
@@ -297,7 +298,13 @@ wiredia/
 5. Processamento → Utilitários específicos
 6. Resposta JSON → Cliente
 
-**Banco de Dados**
+### 4.5 Banco de Dados
+
+**Tecnologia e Configuração**
+- **SGBD**: SQLite
+- **Biblioteca**: better-sqlite3 v12.4.6
+- **Arquivo**: `app.db` (localizado na raiz do projeto)
+- **Tipo**: Banco de dados relacional embutido (arquivo único)
 
 **Diagrama Entidade Relacionamento**
 
@@ -329,22 +336,30 @@ erDiagram
 
 **Estrutura das Tabelas**
 
-Tabela `users`:
-- id (INTEGER PRIMARY KEY)
-- email (TEXT UNIQUE)
-- password (TEXT)
-- ip_registro (TEXT)
+**Tabela `users`**
+Armazena informações dos usuários cadastrados no sistema.
+- `id` (INTEGER PRIMARY KEY AUTOINCREMENT) - Identificador único do usuário
+- `email` (TEXT UNIQUE) - Email do usuário (único, usado para login)
+- `password` (TEXT) - Hash da senha criptografada com bcrypt
+- `ip_registro` (TEXT) - IP de origem do registro
 
-Tabela `api_keys`:
-- id (INTEGER PRIMARY KEY)
-- user_id (INTEGER, FOREIGN KEY -> users.id)
-- key (TEXT UNIQUE)
-- created_at (INTEGER)
+**Tabela `api_keys`**
+Armazena as chaves de API geradas pelos usuários.
+- `id` (INTEGER PRIMARY KEY AUTOINCREMENT) - Identificador único da chave
+- `user_id` (INTEGER, FOREIGN KEY -> users.id) - Referência ao usuário proprietário
+- `key` (TEXT UNIQUE) - Chave de API (48 caracteres hexadecimais, única)
+- `created_at` (INTEGER) - Timestamp Unix da criação da chave
 
-Tabela `usage`:
-- id (INTEGER PRIMARY KEY)
-- user_id (INTEGER, FOREIGN KEY -> users.id)
-- count (INTEGER DEFAULT 0)
+**Tabela `usage`**
+Armazena o contador de requisições por usuário.
+- `id` (INTEGER PRIMARY KEY AUTOINCREMENT) - Identificador único do registro
+- `user_id` (INTEGER, FOREIGN KEY -> users.id) - Referência ao usuário
+- `count` (INTEGER DEFAULT 0) - Contador de requisições realizadas
+
+**Relacionamentos**
+- Um usuário (`users`) pode possuir múltiplas API keys (`api_keys`) - Relação 1:N
+- Um usuário (`users`) possui um único contador de uso (`usage`) - Relação 1:1
+- As chaves estrangeiras garantem integridade referencial (CASCADE DELETE não configurado)
 
 ---
 
