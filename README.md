@@ -3,6 +3,21 @@
 > Documentação rápida dos endpoints expostos pelo servidor Express (`main.ts`).  
 > Todos retornam respostas em JSON e seguem o rate limit global de **100 requisições por minuto por IP**.
 
+[Ver Levantamento de Requisitos](./REQUISITOS.md)
+
+---
+
+## Índice
+
+- [Features](#features)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Autenticação](#autenticação)
+- [Rotas disponíveis](#rotas-disponíveis)
+- [Logging](#logging)
+- [Execução](#execução)
+
+---
+
 ## Features
 
 - **Autenticação**: Sistema de login/registro com JWT e senhas criptografadas (bcrypt)
